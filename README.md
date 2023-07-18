@@ -9,6 +9,12 @@ $ npm i -g typescript
 ```
 $ npm i -g aws-cdk
 ```
+## Select instance type
+Edit following line [wax-node-cdk-stack](./lib/wax-node-cdk-stack.ts)
+
+```
+instanceType: ec2.InstanceType.of(ec2.InstanceClass.R5N, ec2.InstanceSize.XLARGE2),
+```
 
 ## Build
 - Install
