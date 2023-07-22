@@ -1,10 +1,14 @@
 import * as cdk from 'aws-cdk-lib';
 import * as ec2 from "aws-cdk-lib/aws-ec2";
 import * as iam from 'aws-cdk-lib/aws-iam'
+import * as path from 'path';
 import { aws_ssm as ssm } from 'aws-cdk-lib';
+import { aws_logs as logs } from 'aws-cdk-lib';
 
 import { Construct } from 'constructs';
 import { readFileSync } from 'fs';
+
+declare const dataProtectionPolicy: any;
 
 export class WaxNodeCdkStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -65,6 +69,7 @@ export class WaxNodeCdkStack extends cdk.Stack {
       assumedBy: new iam.ServicePrincipal('ec2.amazonaws.com')
     })
     role.addManagedPolicy(iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonSSMManagedInstanceCore'))
+    role.addManagedPolicy(iam.ManagedPolicy.fromAwsManagedPolicyName('CloudWatchAgentServerPolicy'))
 
     const machineImage = ec2.MachineImage.fromSsmParameter(
       '/aws/service/canonical/ubuntu/server/focal/stable/current/amd64/hvm/ebs-gp2/ami-id',
@@ -84,6 +89,14 @@ export class WaxNodeCdkStack extends cdk.Stack {
       securityGroup: securityGroup,
       role: role,
       blockDevices: [rootVolume]
+    });
+
+    const cfnLogGroup = new logs.CfnLogGroup(this, 'CfnLogGroup', {
+      logGroupName: '/waxnode/'
+    });
+    const cfnLogStream = new logs.CfnLogStream(this, 'CfnLogStream', {
+      logGroupName: '/waxnode/',
+      logStreamName: 'logs',
     });
 
     // 👇 load user data script
