@@ -8,8 +8,6 @@ import { aws_logs as logs } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import { readFileSync } from 'fs';
 
-declare const dataProtectionPolicy: any;
-
 export class WaxNodeCdkStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
@@ -95,7 +93,7 @@ export class WaxNodeCdkStack extends cdk.Stack {
       logGroupName: '/waxnode/'
     });
     const cfnLogStream = new logs.CfnLogStream(this, 'CfnLogStream', {
-      logGroupName: '/waxnode/',
+      logGroupName: cfnLogGroup.logGroupName as string,
       logStreamName: 'logs',
     });
 
