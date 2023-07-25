@@ -46,17 +46,17 @@ WaxNodeCdkStack.sshcommand = aws ssm start-session --target i-${instance-id} --d
 ```
 $ aws ssm start-session --target i-${instance-id} --document-name SSM-WaxNodeCdkConfiguration
 ```
+- Check Setup status
+```
+$ sudo tail -f /var/log/cloud-init-output.log
+```
 
 ## Check Node Status
 * Note: it might take up to 30 minutes for the node to start up and few days for the node to sync to the newest block.
 
 - check log status
 ```
-$ sudo service wax status
-Jul 18 03:36:13 ip-10-0-0-46 start.sh[4777]: 1781300K .......... .......... .......... .......... .......... 31%  123M 4m>
-Jul 18 03:36:13 ip-10-0-0-46 start.sh[4777]: 1781350K .......... .......... .......... .......... .......... 31%  100M 4m>
-Jul 18 03:36:13 ip-10-0-0-46 start.sh[4777]: 1781400K .......... .......... .......... .......... .......... 31% 41.9M 4m>
-Jul 18 03:36:13 ip-10-0-0-46 start.sh[4777]: 1781450K .......... .......... .......... .......... .......... 31%  151M 4m>
+$ tail -f /var/log/wax/logs.log
 ```
 
 - Monitor the node status inside instance
