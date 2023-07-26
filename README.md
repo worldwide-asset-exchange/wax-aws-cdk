@@ -41,6 +41,9 @@ WaxNodeCdkStack.IPAddress = XXX.XXX.XXX.XXX
 WaxNodeCdkStack.sshcommand = aws ssm start-session --target i-${instance-id} --document-name SSM-WaxNodeCdkConfiguration
 ```
 
+- Monitor log in cloudwatch
+Go to [CloudWatch](https://console.aws.amazon.com/cloudwatch) > Log groups >/waxnode/ > logs
+
 ## Login to instance
 - Login by Session Manager
 ```
