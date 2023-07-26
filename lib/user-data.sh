@@ -26,7 +26,7 @@ sudo systemctl enable docker.service
 sudo systemctl enable containerd.service
 
 echo "Pulling wax-node project"
-git clone -b export-nodeos-log https://github.com/worldwide-asset-exchange/wax-node.git
+git clone https://github.com/worldwide-asset-exchange/wax-node.git
 
 echo "Starting wax-node..."
 cd wax-node
