@@ -44,7 +44,7 @@ $ START_FROM_SNAPSHOT=true ENABLE_SHIP_NODE=false cdk deploy
 ```
 1. Deploy ship node
 ```
-$ START_FROM_SNAPSHOT=false ENABLE_SHIP_NODE=false cdk deploy
+$ START_FROM_SNAPSHOT=false ENABLE_SHIP_NODE=true cdk deploy
 ```
 1. Deploy ship node with snapshot
 ```
