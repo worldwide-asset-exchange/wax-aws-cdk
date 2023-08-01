@@ -5,7 +5,7 @@
 ```
 $ npm i -g typescript
 ```
-- If you are running these commands in Cloud9 or already have CDK installed, then skip this command
+- If you are running these commands in Cloud or already have CDK installed, then skip this command
 ```
 $ npm i -g aws-cdk
 ```
@@ -27,14 +27,17 @@ $ npm install
 $ npm run build
 ```
 
-## Deploy
-- Set deploy account, region
+## Deployment Instructions
+### Set the deploy account and region
+Before deploying the project, ensure you have the AWS CLI configured with the desired account and region. Use the following command to bootstrap the CDK environment:
 ```
 $ cdk bootstrap aws://account-id/region
 ```
 
-- Deploy api node
-This project relies on [wax-node](https://github.com/worldwide-asset-exchange/wax-node) to start the node
+### Deploy
+This project relies on [wax-node](https://github.com/worldwide-asset-exchange/wax-node) to start the node. To deploy the API node, execute the following command:
+
+1. Deploy api node
 ```
 $ START_FROM_SNAPSHOT=false ENABLE_SHIP_NODE=false cdk deploy
 Outputs:
@@ -42,21 +45,21 @@ WaxNodeCdkStack.IPAddress = XXX.XXX.XXX.XXX
 WaxNodeCdkStack.sshcommand = aws ssm start-session --target i-${instance-id} --document-name SSM-WaxNodeCdkConfiguration
 ```
 
-- Deploy api node with snapshot
+1. Deploy api node with snapshot
 ```
 $ START_FROM_SNAPSHOT=true ENABLE_SHIP_NODE=false cdk deploy
 ```
 
-- Deploy ship node
+1. Deploy ship node
 ```
 $ START_FROM_SNAPSHOT=false ENABLE_SHIP_NODE=false cdk deploy
 ```
 
-- Deploy ship node with snapshot
+1. Deploy ship node with snapshot
 ```
 $ START_FROM_SNAPSHOT=true ENABLE_SHIP_NODE=true cdk deploy
 ```
-
+### Monitor
 - Monitor log in cloudwatch
 Go to [CloudWatch](https://console.aws.amazon.com/cloudwatch) > Log groups >/waxnode/ > logs
 
