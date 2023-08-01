@@ -33,12 +33,28 @@ $ npm run build
 $ cdk bootstrap aws://account-id/region
 ```
 
-- Deploy
+- Deploy api node
+This project relies on [wax-node](https://github.com/worldwide-asset-exchange/wax-node) to start the node
 ```
-$ cdk deploy
+$ START_FROM_SNAPSHOT=false ENABLE_SHIP_NODE=false cdk deploy
 Outputs:
 WaxNodeCdkStack.IPAddress = XXX.XXX.XXX.XXX
 WaxNodeCdkStack.sshcommand = aws ssm start-session --target i-${instance-id} --document-name SSM-WaxNodeCdkConfiguration
+```
+
+- Deploy api node with snapshot
+```
+$ START_FROM_SNAPSHOT=true ENABLE_SHIP_NODE=false cdk deploy
+```
+
+- Deploy ship node
+```
+$ START_FROM_SNAPSHOT=false ENABLE_SHIP_NODE=false cdk deploy
+```
+
+- Deploy ship node with snapshot
+```
+$ START_FROM_SNAPSHOT=true ENABLE_SHIP_NODE=true cdk deploy
 ```
 
 - Monitor log in cloudwatch

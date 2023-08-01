@@ -16,6 +16,7 @@ echo \
   sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 sleep 3
 sudo apt-get update  -y
+sleep 3
 sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
 sudo apt-get install zstd -y
 
@@ -25,24 +26,3 @@ sudo usermod -aG docker ubuntu
 echo "Configure Docker to start on boot with systemd"
 sudo systemctl enable docker.service
 sudo systemctl enable containerd.service
-
-echo "Pulling wax-node project"
-git clone https://github.com/worldwide-asset-exchange/wax-node.git
-
-echo "Starting wax-node..."
-cd wax-node
-sudo mkdir /opt/wax
-sudo mkdir /var/log/wax
-sudo cp -r . /opt/wax/
-sudo cp ./wax.service /etc/systemd/system/wax.service
-sudo systemctl enable wax
-sudo service wax start
-
-echo "setup aws cloudwatch"
-mkdir /tmp/cloudwatch-logs && cd /tmp/cloudwatch-logs
-wget https://s3.amazonaws.com/amazoncloudwatch-agent/ubuntu/amd64/latest/amazon-cloudwatch-agent.deb
-sudo dpkg -i -E ./amazon-cloudwatch-agent.deb
-
-echo "start aws cloudwatch"
-sudo wget https://waxnode-cloudwatch-config.s3.ap-southeast-1.amazonaws.com/config.json
-sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/tmp/cloudwatch-logs/config.json -s
