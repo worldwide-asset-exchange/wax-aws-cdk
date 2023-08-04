@@ -43,7 +43,7 @@ export class WaxNodeCdkStack extends cdk.Stack {
 
     // Allow outbound access
     // No port 22 access, connections managed by AWS Systems Manager Session Manager
-    // Inbound access rules for Rocketpool set below
+    // Inbound access rules for Waxnode set below
 
     const securityGroup = new ec2.SecurityGroup(this, 'SecurityGroup', {
       vpc,
@@ -60,7 +60,7 @@ export class WaxNodeCdkStack extends cdk.Stack {
     securityGroup.addIngressRule(
       ec2.Peer.anyIpv4(),
       ec2.Port.tcp(8888),
-      'allow nodeos port: 8888',
+      'allow api nodeos port: 8888',
     );
 
     if(process.env.ENABLE_SHIP_NODE){
@@ -105,6 +105,7 @@ export class WaxNodeCdkStack extends cdk.Stack {
       logGroupName: cfnLogGroup.logGroupName as string,
       logStreamName: 'logs',
     });
+    cfnLogStream.node.addDependency(cfnLogGroup);
 
     // 👇 load user data script
     const userDataScript = readFileSync('./lib/init-scripts/user-data.sh', 'utf8');
