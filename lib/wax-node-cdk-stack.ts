@@ -116,14 +116,14 @@ export class WaxNodeCdkStack extends cdk.Stack {
     const cloudWatchScript = readFileSync('./lib/init-scripts/cloud-watch.sh', 'utf8');
     // 👇 add user data to the EC2 instance
     ec2Instance.addUserData(userDataScript);
-    if(!process.env.ENABLE_SHIP_NODE){
-      if(!process.env.START_FROM_SNAPSHOT){
+    if(process.env.ENABLE_SHIP_NODE !== 'true'){
+      if(process.env.START_FROM_SNAPSHOT  !== 'true'){
         ec2Instance.addUserData(apiNodeScript);
       }else{
         ec2Instance.addUserData(apiNodeSnapshotScript);
       }
     }else{
-      if(!process.env.START_FROM_SNAPSHOT){
+      if(process.env.START_FROM_SNAPSHOT !== 'true'){
         ec2Instance.addUserData(shipNodeScript);
       }else{
         ec2Instance.addUserData(shipNodeSnapshotScript);
