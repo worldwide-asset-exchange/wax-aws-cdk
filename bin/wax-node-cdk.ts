@@ -2,9 +2,13 @@
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
 import { WaxNodeCdkStack } from '../lib/wax-node-cdk-stack';
+import { AwsSolutionsChecks } from 'cdk-nag'
 
 const app = new cdk.App();
+cdk.Aspects.of(app).add(new AwsSolutionsChecks({ verbose: true }))
 new WaxNodeCdkStack(app, 'WaxNodeCdkStack', {
+  env: { account:process.env.AWS_ACCOUNT_ID, region: process.env.AWS_REGION },
+  stackName: `WaxNodeCdkStack`,
   /* If you don't specify 'env', this stack will be environment-agnostic.
    * Account/Region-dependent features and context lookups will not work,
    * but a single synthesized template can be deployed anywhere. */

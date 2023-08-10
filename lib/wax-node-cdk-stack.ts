@@ -3,6 +3,7 @@ import * as ec2 from "aws-cdk-lib/aws-ec2";
 import * as iam from 'aws-cdk-lib/aws-iam'
 import { aws_ssm as ssm } from 'aws-cdk-lib';
 import { aws_logs as logs } from 'aws-cdk-lib';
+import { NagSuppressions } from "cdk-nag";
 
 import { Construct } from 'constructs';
 import { readFileSync } from 'fs';
@@ -10,6 +11,8 @@ import { readFileSync } from 'fs';
 export class WaxNodeCdkStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
+    console.log('AWS_REGION 👉', process.env.AWS_REGION);
+    console.log('AWS_ACCOUNT_ID 👉', process.env.AWS_ACCOUNT_ID);
     console.log('START_FROM_SNAPSHOT 👉', process.env.START_FROM_SNAPSHOT);
     console.log('ENABLE_SHIP_NODE 👉', process.env.ENABLE_SHIP_NODE);
     const cfnDocument = new ssm.CfnDocument(this, 'WaxNodeCdkSessionManagerDocument', {
@@ -31,15 +34,8 @@ export class WaxNodeCdkStack extends cdk.Stack {
       documentType: 'Session'
     });
 
-    // Create new VPC with 2 Subnets
-    const vpc = new ec2.Vpc(this, 'VPC', {
-      natGateways: 0,
-      subnetConfiguration: [{
-        cidrMask: 24,
-        name: "asterisk",
-        subnetType: ec2.SubnetType.PUBLIC
-      }]
-    });
+    // We re-use the default VPC that AWS accounts have
+    const vpc = ec2.Vpc.fromLookup(this, "Vpc", { isDefault: true });
 
     // Allow outbound access
     // No port 22 access, connections managed by AWS Systems Manager Session Manager
@@ -52,22 +48,22 @@ export class WaxNodeCdkStack extends cdk.Stack {
     });
 
     securityGroup.addIngressRule(
-      ec2.Peer.anyIpv4(),
+      ec2.Peer.ipv4(vpc.vpcCidrBlock),
       ec2.Port.tcp(443),
-      'allow HTTPS traffic from anywhere',
+      'Allow HTTPS traffic only from within the VPC',
     );
 
     securityGroup.addIngressRule(
-      ec2.Peer.anyIpv4(),
+      ec2.Peer.ipv4(vpc.vpcCidrBlock),
       ec2.Port.tcp(8888),
-      'allow api nodeos port: 8888',
+      'Allow api nodeos port: 8888 from within the VPC',
     );
 
     if(process.env.ENABLE_SHIP_NODE){
       securityGroup.addIngressRule(
-        ec2.Peer.anyIpv4(),
+        ec2.Peer.ipv4(vpc.vpcCidrBlock),
         ec2.Port.tcp(8080),
-        'allow ship nodeos port: 8080',
+        'allow ship nodeos port: 8080 from within the VPC',
       );
     }
 
@@ -84,7 +80,12 @@ export class WaxNodeCdkStack extends cdk.Stack {
       })
     const rootVolume: ec2.BlockDevice = {
       deviceName: '/dev/sda1', // Use the root device name
-      volume: ec2.BlockDeviceVolume.ebs(512), // Override the volume size in Gibibytes (GiB) - 512GB for RPL
+      volume: ec2.BlockDeviceVolume.ebs(512, { // Override the volume size in Gibibytes (GiB) - 512GB for RPL
+        deleteOnTermination: true,
+        encrypted: true,
+        iops: 5000,
+        volumeType: ec2.EbsDeviceVolumeType.GP3,
+    }),
     };
 
     // Create the instance using the Security Group, AMI, and KeyPair defined in the VPC created
@@ -134,5 +135,25 @@ export class WaxNodeCdkStack extends cdk.Stack {
     // Create outputs for connecting
     new cdk.CfnOutput(this, 'IP Address', { value: ec2Instance.instancePublicIp });
     new cdk.CfnOutput(this, 'ssh command', { value: 'aws ssm start-session --target ' + ec2Instance.instanceId + ' --document-name ' + cfnDocument.name });
+
+    // Add a nag suppressions.
+    NagSuppressions.addResourceSuppressions(
+      this,
+      [
+          {
+              id: "AwsSolutions-IAM4",
+              reason: "AmazonSSMManagedInstanceCore and CloudWatchAgentServerPolicy have acceptable level of restrictions",
+          },
+          {
+            id: "AwsSolutions-EC28",
+            reason: "WAX nodes don't require detaild monitoring to be enabled to save costs",
+          },
+          {
+            id: "AwsSolutions-EC29",
+            reason: "These nodes are ment to be managed manually and don't require termination protection",
+          },
+      ],
+      true
+  );
   }
 }
