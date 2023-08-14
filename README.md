@@ -11,6 +11,14 @@ $ npm i -g typescript
 $ npm i -g aws-cdk
 ```
 
+- If you have deleted or don't have the default VPC, create default VPC
+
+```bash
+    aws ec2 create-default-vpc
+   ```
+
+   **Note:** You may see the following error if the default VPC already exists: `An error occurred (DefaultVpcAlreadyExists) when calling the CreateDefaultVpc operation: A Default VPC already exists for this account in this region.`. That means you can just continue with the following steps.
+
 ## Build
 - Install
 ```
@@ -26,29 +34,31 @@ $ npm run build
 ### Set the deploy account and region
 Before deploying the project, ensure you have the AWS CLI configured with the desired account and region. Use the following command to bootstrap the CDK environment:
 ```
-$ cdk bootstrap aws://account-id/region
+export AWS_REGION=<your_region> 
+export AWS_ACCOUNT_ID=<your_account_id>
+cdk bootstrap aws://account-id/region
 ```
 
 ### Deploy
 This project relies on [wax-node](https://github.com/worldwide-asset-exchange/wax-node) to start the node. To deploy the API node, execute the following command:
 1. Deploy api node
 ```
-$ START_FROM_SNAPSHOT=false ENABLE_SHIP_NODE=false cdk deploy
+AWS_REGION=<your_region> AWS_ACCOUNT_ID=<your_account_id> START_FROM_SNAPSHOT=false ENABLE_SHIP_NODE=false npx cdk deploy
 Outputs:
 WaxNodeCdkStack.IPAddress = XXX.XXX.XXX.XXX
 WaxNodeCdkStack.sshcommand = aws ssm start-session --target i-${instance-id} --document-name SSM-WaxNodeCdkConfiguration
 ```
 1. Deploy api node with snapshot
 ```
-$ START_FROM_SNAPSHOT=true ENABLE_SHIP_NODE=false cdk deploy
+AWS_REGION=<your_region> AWS_ACCOUNT_ID=<your_account_id> START_FROM_SNAPSHOT=true ENABLE_SHIP_NODE=false npx cdk deploy
 ```
 1. Deploy ship node
 ```
-$ START_FROM_SNAPSHOT=false ENABLE_SHIP_NODE=true cdk deploy
+AWS_REGION=<your_region> AWS_ACCOUNT_ID=<your_account_id> START_FROM_SNAPSHOT=false ENABLE_SHIP_NODE=true npx cdk deploy
 ```
 1. Deploy ship node with snapshot
 ```
-$ START_FROM_SNAPSHOT=true ENABLE_SHIP_NODE=true cdk deploy
+AWS_REGION=<your_region> AWS_ACCOUNT_ID=<your_account_id> START_FROM_SNAPSHOT=true ENABLE_SHIP_NODE=true npx cdk deploy
 ```
 
 ### Monitor
