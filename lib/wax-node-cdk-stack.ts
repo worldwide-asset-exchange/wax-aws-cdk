@@ -59,7 +59,13 @@ export class WaxNodeCdkStack extends cdk.Stack {
       'Allow api nodeos port: 8888 from within the VPC',
     );
 
-    if(process.env.ENABLE_SHIP_NODE){
+    securityGroup.addIngressRule(
+      ec2.Peer.anyIpv4(),
+      ec2.Port.udp(9876),
+      'Allow Peer to peer nodeos port: 9876 from anywhere',
+    );
+
+    if(process.env.ENABLE_SHIP_NODE === 'true'){
       securityGroup.addIngressRule(
         ec2.Peer.ipv4(vpc.vpcCidrBlock),
         ec2.Port.tcp(8080),
