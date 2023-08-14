@@ -3,8 +3,7 @@
 # Update with optional user data that will run on instance start.
 # Learn more about user-data: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/user-data.html
 echo "install packages!"
-sudo apt-get update -y
-apt-get install ca-certificates curl gnupg -y
+sudo apt-get update -y && sudo apt-get install ca-certificates curl gnupg -y
 
 echo "install docker here!"
 sudo install -m 0755 -d /etc/apt/keyrings
@@ -14,11 +13,7 @@ echo \
   "deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
   "$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
   sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-sleep 3
-sudo apt-get update  -y
-sleep 3
-sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
-sudo apt-get install zstd -y
+sudo apt-get update  -y && sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin zstd -y
 
 echo "Manage Docker as a non-root user"
 sudo usermod -aG docker ubuntu
