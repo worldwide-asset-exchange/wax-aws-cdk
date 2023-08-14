@@ -97,7 +97,7 @@ export class WaxNodeCdkStack extends cdk.Stack {
     // Create the instance using the Security Group, AMI, and KeyPair defined in the VPC created
     const ec2Instance = new ec2.Instance(this, 'Instance', {
       vpc,
-      instanceType: ec2.InstanceType.of(ec2.InstanceClass.R5N, ec2.InstanceSize.XLARGE2),
+      instanceType: ec2.InstanceType.of(ec2.InstanceClass.R6A, ec2.InstanceSize.XLARGE2),
       machineImage: machineImage,
       securityGroup: securityGroup,
       role: role,
