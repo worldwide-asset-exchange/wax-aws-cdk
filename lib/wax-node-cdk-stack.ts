@@ -59,7 +59,13 @@ export class WaxNodeCdkStack extends cdk.Stack {
       'Allow api nodeos port: 8888 from within the VPC',
     );
 
-    if(process.env.ENABLE_SHIP_NODE){
+    securityGroup.addIngressRule(
+      ec2.Peer.anyIpv4(),
+      ec2.Port.udp(9876),
+      'Allow Peer to peer nodeos port: 9876 from anywhere',
+    );
+
+    if (process.env.ENABLE_SHIP_NODE === 'true') {
       securityGroup.addIngressRule(
         ec2.Peer.ipv4(vpc.vpcCidrBlock),
         ec2.Port.tcp(8080),
@@ -85,13 +91,13 @@ export class WaxNodeCdkStack extends cdk.Stack {
         encrypted: true,
         iops: 5000,
         volumeType: ec2.EbsDeviceVolumeType.GP3,
-    }),
+      }),
     };
 
     // Create the instance using the Security Group, AMI, and KeyPair defined in the VPC created
     const ec2Instance = new ec2.Instance(this, 'Instance', {
       vpc,
-      instanceType: ec2.InstanceType.of(ec2.InstanceClass.R5N, ec2.InstanceSize.XLARGE2),
+      instanceType: ec2.InstanceType.of(ec2.InstanceClass.R6A, ec2.InstanceSize.XLARGE2),
       machineImage: machineImage,
       securityGroup: securityGroup,
       role: role,
@@ -117,16 +123,16 @@ export class WaxNodeCdkStack extends cdk.Stack {
     const cloudWatchScript = readFileSync('./lib/init-scripts/cloud-watch.sh', 'utf8');
     // 👇 add user data to the EC2 instance
     ec2Instance.addUserData(userDataScript);
-    if(process.env.ENABLE_SHIP_NODE !== 'true'){
-      if(process.env.START_FROM_SNAPSHOT  !== 'true'){
+    if (process.env.ENABLE_SHIP_NODE !== 'true') {
+      if (process.env.START_FROM_SNAPSHOT !== 'true') {
         ec2Instance.addUserData(apiNodeScript);
-      }else{
+      } else {
         ec2Instance.addUserData(apiNodeSnapshotScript);
       }
-    }else{
-      if(process.env.START_FROM_SNAPSHOT !== 'true'){
+    } else {
+      if (process.env.START_FROM_SNAPSHOT !== 'true') {
         ec2Instance.addUserData(shipNodeScript);
-      }else{
+      } else {
         ec2Instance.addUserData(shipNodeSnapshotScript);
       }
     }
@@ -140,20 +146,24 @@ export class WaxNodeCdkStack extends cdk.Stack {
     NagSuppressions.addResourceSuppressions(
       this,
       [
-          {
-              id: "AwsSolutions-IAM4",
-              reason: "AmazonSSMManagedInstanceCore and CloudWatchAgentServerPolicy have acceptable level of restrictions",
-          },
-          {
-            id: "AwsSolutions-EC28",
-            reason: "WAX nodes don't require detaild monitoring to be enabled to save costs",
-          },
-          {
-            id: "AwsSolutions-EC29",
-            reason: "These nodes are ment to be managed manually and don't require termination protection",
-          },
+        {
+          id: "AwsSolutions-IAM4",
+          reason: "AmazonSSMManagedInstanceCore and CloudWatchAgentServerPolicy have acceptable level of restrictions",
+        },
+        {
+          id: "AwsSolutions-EC28",
+          reason: "WAX nodes don't require detaild monitoring to be enabled to save costs",
+        },
+        {
+          id: "AwsSolutions-EC29",
+          reason: "These nodes are ment to be managed manually and don't require termination protection",
+        },
+        {
+          id: "AwsSolutions-EC23",
+          reason: "Port 9876 has to be open to public for the node to maintain peer-to-peer connectivity with other nodes on the network.",
+        },
       ],
       true
-  );
+    );
   }
 }

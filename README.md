@@ -36,7 +36,7 @@ Before deploying the project, ensure you have the AWS CLI configured with the de
 ```
 export AWS_REGION=<your_region> 
 export AWS_ACCOUNT_ID=<your_account_id>
-cdk bootstrap aws://account-id/region
+cdk bootstrap aws://$AWS_ACCOUNT_ID/$AWS_REGION
 ```
 
 ### Deploy
