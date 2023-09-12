@@ -1,0 +1,15 @@
+#config file version
+apiVersion: 1
+
+deleteDatasources:
+  - name: VictoriaMetrics
+    orgId: 1
+
+datasources:
+  - name: VictoriaMetrics
+    type: prometheus
+    access: direct
+    orgId: 1
+    url: http://localhost:8428
+    isDefault: true
+    editable: true

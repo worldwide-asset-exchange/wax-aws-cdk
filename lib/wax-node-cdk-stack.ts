@@ -4,9 +4,9 @@ import * as iam from 'aws-cdk-lib/aws-iam'
 import { aws_ssm as ssm } from 'aws-cdk-lib';
 import { aws_logs as logs } from 'aws-cdk-lib';
 import { NagSuppressions } from "cdk-nag";
-
 import { Construct } from 'constructs';
 import { readFileSync } from 'fs';
+
 
 export class WaxNodeCdkStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -33,6 +33,9 @@ export class WaxNodeCdkStack extends cdk.Stack {
       documentFormat: 'JSON',
       documentType: 'Session'
     });
+
+    // Timestamp of all the work being done
+    const ec2Timestamp = Date.now();
 
     // We re-use the default VPC that AWS accounts have
     const vpc = ec2.Vpc.fromLookup(this, "Vpc", { isDefault: true });
@@ -65,6 +68,31 @@ export class WaxNodeCdkStack extends cdk.Stack {
       'Allow Peer to peer nodeos port: 9876 from anywhere',
     );
 
+    const monitoringSecurityGroup = new ec2.SecurityGroup(this, 'SecurityGroup', {
+      vpc,
+      description: 'Monitoring Security Group',
+      allowAllOutbound: true
+    });
+
+    monitoringSecurityGroup.addIngressRule(
+        ec2.Peer.ipv4(vpc.vpcCidrBlock),
+        ec2.Port.tcp(80),
+        '80',
+    );
+
+    monitoringSecurityGroup.addIngressRule(
+        ec2.Peer.ipv4(vpc.vpcCidrBlock),
+        ec2.Port.tcp(443),
+        '443',
+    );
+
+    monitoringSecurityGroup.addIngressRule(
+        ec2.Peer.ipv4(vpc.vpcCidrBlock),
+        ec2.Port.tcp(8428),
+        '8428'
+    );
+
+
     if (process.env.ENABLE_SHIP_NODE === 'true') {
       securityGroup.addIngressRule(
         ec2.Peer.ipv4(vpc.vpcCidrBlock),
@@ -72,6 +100,7 @@ export class WaxNodeCdkStack extends cdk.Stack {
         'allow ship nodeos port: 8080 from within the VPC',
       );
     }
+
 
     const role = new iam.Role(this, 'ec2Role', {
       assumedBy: new iam.ServicePrincipal('ec2.amazonaws.com')
@@ -94,6 +123,16 @@ export class WaxNodeCdkStack extends cdk.Stack {
       }),
     };
 
+    const monitoringRootVolume: ec2.BlockDevice = {
+      deviceName: '/dev/sda1',
+      volume: ec2.BlockDeviceVolume.ebs(500, {
+        deleteOnTermination: true,
+        encrypted: true,
+        iops: 3000,
+        volumeType: ec2.EbsDeviceVolumeType.GP3
+      })
+    }
+
     // Create the instance using the Security Group, AMI, and KeyPair defined in the VPC created
     const ec2Instance = new ec2.Instance(this, 'Instance', {
       vpc,
@@ -103,6 +142,18 @@ export class WaxNodeCdkStack extends cdk.Stack {
       role: role,
       blockDevices: [rootVolume]
     });
+
+    const monitoringInstance = new ec2.Instance(this, 'Instance', {
+      vpc,
+      instanceType: ec2.InstanceType.of(ec2.InstanceClass.M5A, ec2.InstanceSize.XLARGE2),
+      machineImage: machineImage,
+      securityGroup: monitoringSecurityGroup,
+      role: role,
+      blockDevices: [monitoringRootVolume]
+    })
+
+    monitoringInstance.node.applyAspect(new cdk.Tag("Name","wax-grafana-monitoring-stack"));
+
 
     const cfnLogGroup = new logs.CfnLogGroup(this, 'CfnLogGroup', {
       logGroupName: '/waxnode/'
@@ -121,22 +172,37 @@ export class WaxNodeCdkStack extends cdk.Stack {
     const shipNodeScript = readFileSync('./lib/init-scripts/ship-node.sh', 'utf8');
     const shipNodeSnapshotScript = readFileSync('./lib/init-scripts/ship-node-snapshot.sh', 'utf8');
     const cloudWatchScript = readFileSync('./lib/init-scripts/cloud-watch.sh', 'utf8');
+
+    //Configure telegraf script, replace victoriametrics ip with the IP from monitoring instance variable.
+    const telegrafScript = readFileSync('./lib/init-scripts/telegraf.sh', 'utf8');
+    telegrafScript.replace(new RegExp("<VICTORIA_IP>",'g'),monitoringInstance.instancePrivateIp);
+
+    const victoriaScript = readFileSync('./lib/init-scripts/monitoring/victoriametrics.sh', 'utf8');
+    const grafanaScript = readFileSync('./lib/init-scripts/monitoring/grafana.sh', 'utf8');
+
     // 👇 add user data to the EC2 instance
     ec2Instance.addUserData(userDataScript);
     if (process.env.ENABLE_SHIP_NODE !== 'true') {
       if (process.env.START_FROM_SNAPSHOT !== 'true') {
         ec2Instance.addUserData(apiNodeScript);
+        ec2Instance.node.applyAspect(new cdk.Tag("Name",`wax-pub-node-${ec2Timestamp}`))
       } else {
         ec2Instance.addUserData(apiNodeSnapshotScript);
       }
     } else {
       if (process.env.START_FROM_SNAPSHOT !== 'true') {
         ec2Instance.addUserData(shipNodeScript);
+        ec2Instance.node.applyAspect(new cdk.Tag("Name",`wax-ship-node-${ec2Timestamp}`))
       } else {
         ec2Instance.addUserData(shipNodeSnapshotScript);
       }
     }
     ec2Instance.addUserData(cloudWatchScript);
+    ec2Instance.addUserData(telegrafScript);
+
+    // Add user data to the Monitoring Instance
+    monitoringInstance.addUserData(victoriaScript)
+    monitoringInstance.addUserData(grafanaScript)
 
     // Create outputs for connecting
     new cdk.CfnOutput(this, 'IP Address', { value: ec2Instance.instancePublicIp });
