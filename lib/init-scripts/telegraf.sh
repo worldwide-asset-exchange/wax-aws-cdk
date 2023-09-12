@@ -22,6 +22,7 @@ function update_os() {
 
 function install_telegraf() {
   apt-get install telegraf -y
+  service telegraf stop
 }
 
 function clean_defaults() {
@@ -57,3 +58,5 @@ search_and_replace "/etc/telegraf/telegraf.conf" "<VICTORIA_DB_URL>" "$VICTORIA_
 mkdir -p /etc/telegraf/monitoring-scripts/
 wget https://raw.githubusercontent.com/worldwide-asset-exchange/wax-aws-cdk/master/lib/init-scripts/wax-node-monitoring.sh -O /etc/telegraf/monitoring-scripts/
 chmod +x /etc/telegraf/monitoring-scripts/wax-node-monitoring.sh
+
+service telegraf restart
