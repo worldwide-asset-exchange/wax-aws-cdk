@@ -15,6 +15,9 @@ export class WaxNodeCdkStack extends cdk.Stack {
     console.log('AWS_ACCOUNT_ID 👉', process.env.AWS_ACCOUNT_ID);
     console.log('START_FROM_SNAPSHOT 👉', process.env.START_FROM_SNAPSHOT);
     console.log('ENABLE_SHIP_NODE 👉', process.env.ENABLE_SHIP_NODE);
+
+    const waxNodeType = process.env.ENABLE_SHIP_NODE !== "true" ? "api" : "state-history";
+
     const cfnDocument = new ssm.CfnDocument(this, 'WaxNodeCdkSessionManagerDocument', {
       content: {
         "schemaVersion": "1.0",
@@ -44,7 +47,7 @@ export class WaxNodeCdkStack extends cdk.Stack {
     // No port 22 access, connections managed by AWS Systems Manager Session Manager
     // Inbound access rules for Waxnode set below
 
-    const securityGroup = new ec2.SecurityGroup(this, 'SecurityGroup', {
+    const securityGroup = new ec2.SecurityGroup(this, `wax-node-sg-${ec2Timestamp}`, {
       vpc,
       description: 'WaxNode security group.',
       allowAllOutbound: true
@@ -68,7 +71,7 @@ export class WaxNodeCdkStack extends cdk.Stack {
       'Allow Peer to peer nodeos port: 9876 from anywhere',
     );
 
-    const monitoringSecurityGroup = new ec2.SecurityGroup(this, 'SecurityGroup', {
+    const monitoringSecurityGroup = new ec2.SecurityGroup(this, `wax-monitoring-node-sg-${ec2Timestamp}`, {
       vpc,
       description: 'Monitoring Security Group',
       allowAllOutbound: true
@@ -133,8 +136,10 @@ export class WaxNodeCdkStack extends cdk.Stack {
       })
     }
 
+
+
     // Create the instance using the Security Group, AMI, and KeyPair defined in the VPC created
-    const ec2Instance = new ec2.Instance(this, 'Instance', {
+    const ec2Instance = new ec2.Instance(this, `wax-node-${waxNodeType}-${ec2Timestamp}`, {
       vpc,
       instanceType: ec2.InstanceType.of(ec2.InstanceClass.R6A, ec2.InstanceSize.XLARGE2),
       machineImage: machineImage,
@@ -143,7 +148,7 @@ export class WaxNodeCdkStack extends cdk.Stack {
       blockDevices: [rootVolume]
     });
 
-    const monitoringInstance = new ec2.Instance(this, 'Instance', {
+    const monitoringInstance = new ec2.Instance(this, `wax-monitoring-node-${ec2Timestamp}`, {
       vpc,
       instanceType: ec2.InstanceType.of(ec2.InstanceClass.M5A, ec2.InstanceSize.XLARGE2),
       machineImage: machineImage,
@@ -152,7 +157,7 @@ export class WaxNodeCdkStack extends cdk.Stack {
       blockDevices: [monitoringRootVolume]
     })
 
-    monitoringInstance.node.applyAspect(new cdk.Tag("Name","wax-grafana-monitoring-stack"));
+    monitoringInstance.node.applyAspect(new cdk.Tag("Name",`wax-monitoring-node-${ec2Timestamp}`));
 
 
     const cfnLogGroup = new logs.CfnLogGroup(this, 'CfnLogGroup', {
