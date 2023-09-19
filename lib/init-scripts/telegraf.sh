@@ -47,16 +47,15 @@ install_telegraf
 clean_defaults
 get_github_default_config
 search_and_replace "/etc/telegraf/telegraf.conf" "<HOSTNAME>" "$HOSTNAME"
-search_and_replace "/etc/telegraf/telegraf.conf" "<PUBLIC_IPV4>" "$PUBLIC_IPV4"
-search_and_replace "/etc/telegraf/telegraf.conf" "<PRIVATE_IPV4>" "$PRIVATE_IPV4"
+search_and_replace "/etc/telegraf/telegraf.conf" "<PUBLIC_IP>" "$PUBLIC_IPV4"
+search_and_replace "/etc/telegraf/telegraf.conf" "<PRIVATE_IP>" "$PRIVATE_IPV4"
 search_and_replace "/etc/telegraf/telegraf.conf" "<REGION>" "$REGION"
 search_and_replace "/etc/telegraf/telegraf.conf" "<AVAILABILITY_ZONE>" "$AVAILABILITY_ZONE"
 search_and_replace "/etc/telegraf/telegraf.conf" "<SUBNET_ID>" "$SUBNET_ID"
 search_and_replace "/etc/telegraf/telegraf.conf" "<VPC_ID>" "$VPC_ID"
-search_and_replace "/etc/telegraf/telegraf.conf" "<VICTORIA_DB_URL>" "$VICTORIA_IP"
 
 mkdir -p /etc/telegraf/monitoring-scripts/
-wget https://raw.githubusercontent.com/worldwide-asset-exchange/wax-aws-cdk/master/lib/init-scripts/wax-node-monitoring.sh -O /etc/telegraf/monitoring-scripts/
+wget https://raw.githubusercontent.com/worldwide-asset-exchange/wax-aws-cdk/master/lib/init-scripts/wax-node-monitoring.sh -O /etc/telegraf/monitoring-scripts/wax-node-monitoring.sh
 chmod +x /etc/telegraf/monitoring-scripts/wax-node-monitoring.sh
 
 service telegraf restart

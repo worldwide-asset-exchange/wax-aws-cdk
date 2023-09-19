@@ -13,7 +13,7 @@ rm -rf /etc/nginx/sites-enabled/*
 rm -rf /etc/nginx/sites-available/*
 
 wget https://raw.githubusercontent.com/worldwide-asset-exchange/wax-aws-cdk/master/lib/config/nginx/nginx.conf -O /etc/nginx/nginx.conf
-wget https://raw.githubusercontent.com/worldwide-asset-exchange/wax-aws-cdk/master/lib/config/nginx/grafana.conf -O /etc/nginx/sites-enabled/grafana.conf
+wget https://raw.githubusercontent.com/worldwide-asset-exchange/wax-aws-cdk/master/lib/config/nginx/www.conf -O /etc/nginx/sites-enabled/www.conf
 
 service grafana-server stop
 
@@ -22,11 +22,17 @@ wget https://raw.githubusercontent.com/grafana/grafana/main/conf/sample.ini -O /
 sed -i "s/;provisioning/provisioning/g" /etc/grafana/grafana.ini
 sed -i "s/;http_addr = /http_addr = 127.0.0.1/g" /etc/grafana/grafana.ini
 sed -i "s/;http_port = /http_port = /g" /etc/grafana/grafana.ini
+#sed -i "s/;root_url/root_url/g" /etc/grafana/grafana.ini
+#sed -i "s/%(http_port)s\//%(http_port)s\/monitoring\//g" /etc/grafana/grafana.ini
 
 wget https://raw.githubusercontent.com/worldwide-asset-exchange/wax-aws-cdk/master/lib/config/grafana/provisioning/dashboards/wax-nodes.yml \
 -O /etc/grafana/provisioning/dashboards/wax-nodes.yml
+
 wget https://raw.githubusercontent.com/worldwide-asset-exchange/wax-aws-cdk/master/lib/config/grafana/provisioning/datasources/prometheus.yml \
 -O /etc/grafana/provisioning/datasources/prometheus.yml
+
+mkdir -p /var/lib/grafana/dashboards
+
 wget https://raw.githubusercontent.com/worldwide-asset-exchange/wax-aws-cdk/master/lib/config/grafana/provisioning-data/dashboards/default.json \
 -O /var/lib/grafana/dashboards/default.json
 

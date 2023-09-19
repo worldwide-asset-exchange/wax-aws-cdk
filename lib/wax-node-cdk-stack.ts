@@ -71,31 +71,6 @@ export class WaxNodeCdkStack extends cdk.Stack {
       'Allow Peer to peer nodeos port: 9876 from anywhere',
     );
 
-    const monitoringSecurityGroup = new ec2.SecurityGroup(this, `wax-monitoring-node-sg-${ec2Timestamp}`, {
-      vpc,
-      description: 'Monitoring Security Group',
-      allowAllOutbound: true
-    });
-
-    monitoringSecurityGroup.addIngressRule(
-        ec2.Peer.ipv4(vpc.vpcCidrBlock),
-        ec2.Port.tcp(80),
-        '80',
-    );
-
-    monitoringSecurityGroup.addIngressRule(
-        ec2.Peer.ipv4(vpc.vpcCidrBlock),
-        ec2.Port.tcp(443),
-        '443',
-    );
-
-    monitoringSecurityGroup.addIngressRule(
-        ec2.Peer.ipv4(vpc.vpcCidrBlock),
-        ec2.Port.tcp(8428),
-        '8428'
-    );
-
-
     if (process.env.ENABLE_SHIP_NODE === 'true') {
       securityGroup.addIngressRule(
         ec2.Peer.ipv4(vpc.vpcCidrBlock),
@@ -118,7 +93,7 @@ export class WaxNodeCdkStack extends cdk.Stack {
       })
     const rootVolume: ec2.BlockDevice = {
       deviceName: '/dev/sda1', // Use the root device name
-      volume: ec2.BlockDeviceVolume.ebs(512, { // Override the volume size in Gibibytes (GiB) - 512GB for RPL
+      volume: ec2.BlockDeviceVolume.ebs(2048, { // Override the volume size in Gibibytes (GiB) - 512GB for RPL
         deleteOnTermination: true,
         encrypted: true,
         iops: 5000,
@@ -126,39 +101,19 @@ export class WaxNodeCdkStack extends cdk.Stack {
       }),
     };
 
-    const monitoringRootVolume: ec2.BlockDevice = {
-      deviceName: '/dev/sda1',
-      volume: ec2.BlockDeviceVolume.ebs(500, {
-        deleteOnTermination: true,
-        encrypted: true,
-        iops: 3000,
-        volumeType: ec2.EbsDeviceVolumeType.GP3
-      })
-    }
-
-
-
     // Create the instance using the Security Group, AMI, and KeyPair defined in the VPC created
     const ec2Instance = new ec2.Instance(this, `wax-node-${waxNodeType}-${ec2Timestamp}`, {
       vpc,
+      vpcSubnets: {
+        subnetType: ec2.SubnetType.PUBLIC
+      },
+      associatePublicIpAddress: true,
       instanceType: ec2.InstanceType.of(ec2.InstanceClass.R6A, ec2.InstanceSize.XLARGE2),
       machineImage: machineImage,
       securityGroup: securityGroup,
       role: role,
       blockDevices: [rootVolume]
     });
-
-    const monitoringInstance = new ec2.Instance(this, `wax-monitoring-node-${ec2Timestamp}`, {
-      vpc,
-      instanceType: ec2.InstanceType.of(ec2.InstanceClass.M5A, ec2.InstanceSize.XLARGE2),
-      machineImage: machineImage,
-      securityGroup: monitoringSecurityGroup,
-      role: role,
-      blockDevices: [monitoringRootVolume]
-    })
-
-    monitoringInstance.node.applyAspect(new cdk.Tag("Name",`wax-monitoring-node-${ec2Timestamp}`));
-
 
     const cfnLogGroup = new logs.CfnLogGroup(this, 'CfnLogGroup', {
       logGroupName: '/waxnode/'
@@ -180,7 +135,7 @@ export class WaxNodeCdkStack extends cdk.Stack {
 
     //Configure telegraf script, replace victoriametrics ip with the IP from monitoring instance variable.
     const telegrafScript = readFileSync('./lib/init-scripts/telegraf.sh', 'utf8');
-    telegrafScript.replace(new RegExp("<VICTORIA_IP>",'g'),monitoringInstance.instancePrivateIp);
+
 
     const victoriaScript = readFileSync('./lib/init-scripts/monitoring/victoriametrics.sh', 'utf8');
     const grafanaScript = readFileSync('./lib/init-scripts/monitoring/grafana.sh', 'utf8');
@@ -190,20 +145,18 @@ export class WaxNodeCdkStack extends cdk.Stack {
     if (process.env.ENABLE_SHIP_NODE !== 'true') {
       if (process.env.START_FROM_SNAPSHOT !== 'true') {
         ec2Instance.addUserData(apiNodeScript);
-        ec2Instance.node.applyAspect(new cdk.Tag("Name",`wax-pub-node-${ec2Timestamp}`))
       } else {
         ec2Instance.addUserData(apiNodeSnapshotScript);
       }
     } else {
       if (process.env.START_FROM_SNAPSHOT !== 'true') {
         ec2Instance.addUserData(shipNodeScript);
-        ec2Instance.node.applyAspect(new cdk.Tag("Name",`wax-ship-node-${ec2Timestamp}`))
       } else {
         ec2Instance.addUserData(shipNodeSnapshotScript);
       }
     }
     ec2Instance.addUserData(cloudWatchScript);
-    ec2Instance.addUserData(telegrafScript);
+    ec2Instance.addUserData(telegrafScript.replace(new RegExp("<VICTORIA_IP>",'g'),monitoringInstance.instancePrivateIp));
 
     // Add user data to the Monitoring Instance
     monitoringInstance.addUserData(victoriaScript)
