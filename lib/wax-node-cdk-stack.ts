@@ -1,7 +1,7 @@
 import * as cdk from 'aws-cdk-lib';
 import * as ec2 from "aws-cdk-lib/aws-ec2";
 import * as iam from 'aws-cdk-lib/aws-iam'
-import { aws_ssm as ssm } from 'aws-cdk-lib';
+import {aws_ssm as ssm, Tags} from 'aws-cdk-lib';
 import { aws_logs as logs } from 'aws-cdk-lib';
 import { NagSuppressions } from "cdk-nag";
 import { Construct } from 'constructs';
@@ -118,6 +118,9 @@ export class WaxNodeCdkStack extends cdk.Stack {
       blockDevices: [rootVolume]
     });
 
+    cdk.Tags.of(ec2Instance).add('Name',`wax-node-${waxNodeType}-${ec2Timestamp}`);
+
+
     const cfnLogGroup = new logs.CfnLogGroup(this, 'CfnLogGroup', {
       logGroupName: '/waxnode/'
     });
@@ -144,6 +147,8 @@ export class WaxNodeCdkStack extends cdk.Stack {
     const grafanaScript = readFileSync('./lib/init-scripts/monitoring/grafana.sh', 'utf8');
 
     // 👇 add user data to the EC2 instance
+    ec2Instance.addUserData(`hostname-ctl set-hostname wax-node-${waxNodeType}-${ec2Timestamp}`)
+    ec2Instance.addUserData(`echo "wax-node-${waxNodeType}-${ec2Timestamp}" > /etc/hostname`)
     ec2Instance.addUserData(userDataScript);
     ec2Instance.addUserData(telegrafScript);
     ec2Instance.addUserData(victoriaScript);
