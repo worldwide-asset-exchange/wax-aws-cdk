@@ -111,7 +111,7 @@ export class WaxNodeCdkStack extends cdk.Stack {
         subnetType: ec2.SubnetType.PUBLIC
       },
       associatePublicIpAddress: true,
-      instanceType: ec2.InstanceType.of(ec2.InstanceClass.R6A, ec2.InstanceSize.XLARGE2),
+      instanceType: ec2.InstanceType.of(ec2.InstanceClass.C5A, ec2.InstanceSize.XLARGE2),
       machineImage: machineImage,
       securityGroup: securityGroup,
       role: role,
