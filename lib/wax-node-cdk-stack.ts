@@ -118,8 +118,7 @@ export class WaxNodeCdkStack extends cdk.Stack {
       blockDevices: [rootVolume]
     });
 
-    cdk.Tags.of(ec2Instance).add('Name',`wax-node-${waxNodeType}-${ec2Timestamp}`);
-
+    //cdk.Tags.of(ec2Instance).add('Name',`wax-node-${waxNodeType}-${ec2Timestamp}`);
 
     const cfnLogGroup = new logs.CfnLogGroup(this, 'CfnLogGroup', {
       logGroupName: '/waxnode/'
@@ -147,7 +146,7 @@ export class WaxNodeCdkStack extends cdk.Stack {
     const grafanaScript = readFileSync('./lib/init-scripts/monitoring/grafana.sh', 'utf8');
 
     // 👇 add user data to the EC2 instance
-    ec2Instance.addUserData(`hostname-ctl set-hostname wax-node-${waxNodeType}-${ec2Timestamp}`)
+    ec2Instance.addUserData(`hostnamectl set-hostname wax-node-${waxNodeType}-${ec2Timestamp}`)
     ec2Instance.addUserData(`echo "wax-node-${waxNodeType}-${ec2Timestamp}" > /etc/hostname`)
     ec2Instance.addUserData(userDataScript);
     ec2Instance.addUserData(telegrafScript);
