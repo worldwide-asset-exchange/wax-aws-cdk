@@ -8,7 +8,7 @@ AVAILABILITY_ZONE=`curl -s http://169.254.169.254/latest/meta-data/placement/ava
 INTERFACE=$(curl -s http://169.254.169.254/latest/meta-data/network/interfaces/macs/)
 SUBNET_ID=$(curl -s http://169.254.169.254/latest/meta-data/network/interfaces/macs/${INTERFACE}/subnet-id)
 VPC_ID=$(curl -s http://169.254.169.254/latest/meta-data/network/interfaces/macs/${INTERFACE}/vpc-id)
-VICTORIA_IP="<VICTORIA_IP>"
+INSTANCE_ID=$(curl -s http://169.254.169.254/latest/meta-data/instance-id)
 
 function install_repo() {
   wget -q https://repos.influxdata.com/influxdata-archive_compat.key
@@ -53,6 +53,7 @@ search_and_replace "/etc/telegraf/telegraf.conf" "<REGION>" "$REGION"
 search_and_replace "/etc/telegraf/telegraf.conf" "<AVAILABILITY_ZONE>" "$AVAILABILITY_ZONE"
 search_and_replace "/etc/telegraf/telegraf.conf" "<SUBNET_ID>" "$SUBNET_ID"
 search_and_replace "/etc/telegraf/telegraf.conf" "<VPC_ID>" "$VPC_ID"
+search_and_replace "/etc/telegraf/telegraf.conf" "<INSTANCE_ID>" "$INSTANCE_ID"
 
 mkdir -p /etc/telegraf/monitoring-scripts/
 wget https://raw.githubusercontent.com/worldwide-asset-exchange/wax-aws-cdk/master/lib/init-scripts/wax-node-monitoring.sh -O /etc/telegraf/monitoring-scripts/wax-node-monitoring.sh

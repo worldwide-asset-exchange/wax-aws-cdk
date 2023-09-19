@@ -6,8 +6,8 @@ apt-get install -y jq net-tools software-properties-common
 
 VM_VER=`curl -s https://api.github.com/repos/VictoriaMetrics/VictoriaMetrics/releases/latest | jq -r '.tag_name'`
 
-curl -L https://github.com/VictoriaMetrics/VictoriaMetrics/releases/download/${VM_VER}/victoria-metrics-amd64-${VM_VER}.tar.gz --output victoria-metrics-amd64-${VM_VER}.tar.gz
-tar xvf victoria-metrics-amd64-${VM_VER}.tar.gz -C /usr/local/bin/
+curl -L https://github.com/VictoriaMetrics/VictoriaMetrics/releases/download/${VM_VER}/victoria-metrics-linux-amd64-${VM_VER}.tar.gz --output victoria-metrics-linux-amd64-${VM_VER}.tar.gz
+tar xvf victoria-metrics-linux-amd64-${VM_VER}.tar.gz -C /usr/local/bin/
 
 chmod +x /usr/local/bin/* -R
 chown root:root /usr/local/bin/* -R

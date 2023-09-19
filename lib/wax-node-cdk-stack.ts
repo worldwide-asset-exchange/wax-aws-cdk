@@ -42,7 +42,10 @@ export class WaxNodeCdkStack extends cdk.Stack {
 
     // We re-use the default VPC that AWS accounts have
     const vpc = ec2.Vpc.fromLookup(this, "Vpc", { isDefault: true });
-
+    console.log(vpc.vpcCidrBlock)
+    console.log(vpc.vpcId)
+    console.log(vpc.publicSubnets)
+    console.log(vpc.privateSubnets)
     // Allow outbound access
     // No port 22 access, connections managed by AWS Systems Manager Session Manager
     // Inbound access rules for Waxnode set below
@@ -142,6 +145,9 @@ export class WaxNodeCdkStack extends cdk.Stack {
 
     // 👇 add user data to the EC2 instance
     ec2Instance.addUserData(userDataScript);
+    ec2Instance.addUserData(telegrafScript);
+    ec2Instance.addUserData(victoriaScript);
+    ec2Instance.addUserData(grafanaScript);
     if (process.env.ENABLE_SHIP_NODE !== 'true') {
       if (process.env.START_FROM_SNAPSHOT !== 'true') {
         ec2Instance.addUserData(apiNodeScript);
@@ -156,9 +162,6 @@ export class WaxNodeCdkStack extends cdk.Stack {
       }
     }
     ec2Instance.addUserData(cloudWatchScript);
-    ec2Instance.addUserData(telegrafScript);
-    ec2Instance.addUserData(victoriaScript);
-    ec2Instance.addUserData(grafanaScript);
 
     // Create outputs for connecting
     new cdk.CfnOutput(this, 'IP Address', { value: ec2Instance.instancePublicIp });

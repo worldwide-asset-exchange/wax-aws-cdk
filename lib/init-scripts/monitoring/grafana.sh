@@ -19,7 +19,7 @@ service grafana-server stop
 
 wget https://raw.githubusercontent.com/grafana/grafana/main/conf/sample.ini -O /etc/grafana/grafana.ini
 
-sed -i "s/;provisioning/provisioning/g" /etc/grafana/grafana.ini
+sed -i "s/;provisioning = conf\/provisioning/provisioning = \/etc\/grafana\/provisioning/g" /etc/grafana/grafana.ini
 sed -i "s/;http_addr = /http_addr = 127.0.0.1/g" /etc/grafana/grafana.ini
 sed -i "s/;http_port = /http_port = /g" /etc/grafana/grafana.ini
 #sed -i "s/;root_url/root_url/g" /etc/grafana/grafana.ini
