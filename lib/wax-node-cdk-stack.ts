@@ -156,11 +156,9 @@ export class WaxNodeCdkStack extends cdk.Stack {
       }
     }
     ec2Instance.addUserData(cloudWatchScript);
-    ec2Instance.addUserData(telegrafScript.replace(new RegExp("<VICTORIA_IP>",'g'),monitoringInstance.instancePrivateIp));
-
-    // Add user data to the Monitoring Instance
-    monitoringInstance.addUserData(victoriaScript)
-    monitoringInstance.addUserData(grafanaScript)
+    ec2Instance.addUserData(telegrafScript);
+    ec2Instance.addUserData(victoriaScript);
+    ec2Instance.addUserData(grafanaScript);
 
     // Create outputs for connecting
     new cdk.CfnOutput(this, 'IP Address', { value: ec2Instance.instancePublicIp });
