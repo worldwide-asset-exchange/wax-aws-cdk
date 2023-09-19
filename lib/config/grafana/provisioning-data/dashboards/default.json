@@ -29,8 +29,223 @@
   "liveNow": false,
   "panels": [
     {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 19,
+      "panels": [],
+      "title": "Blockchain Metrics",
+      "type": "row"
+    },
+    {
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "X3YrI4m7z"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "axisSoftMin": 0,
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 1
+      },
+      "id": 21,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "X3YrI4m7z"
+          },
+          "editorMode": "code",
+          "expr": "head_block_time_difference_value{host=~\"$host\"}",
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Sync Difference",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "X3YrI4m7z"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "axisSoftMin": 0,
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 1
+      },
+      "id": 22,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "X3YrI4m7z"
+          },
+          "editorMode": "code",
+          "expr": "head_block_num_value{host=~\"$host\"}",
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Synced Blocks",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 9
+      },
+      "id": 17,
+      "panels": [],
+      "title": "System Metrics",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "X3YrI4m7z"
       },
       "fieldConfig": {
         "defaults": {
@@ -59,7 +274,7 @@
         "h": 5,
         "w": 4,
         "x": 0,
-        "y": 0
+        "y": 10
       },
       "id": 7,
       "options": {
@@ -80,7 +295,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "X3YrI4m7z"
           },
           "editorMode": "code",
           "expr": "system_uptime{host=~\"$host\"}",
@@ -94,7 +310,8 @@
     },
     {
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "X3YrI4m7z"
       },
       "description": "",
       "fieldConfig": {
@@ -124,7 +341,7 @@
         "h": 5,
         "w": 8,
         "x": 4,
-        "y": 0
+        "y": 10
       },
       "id": 8,
       "options": {
@@ -143,7 +360,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "X3YrI4m7z"
           },
           "editorMode": "code",
           "expr": "system_load1{host=~\"$host\"}",
@@ -159,7 +377,7 @@
           "editorMode": "code",
           "expr": "system_load5{host=~\"$host\"}",
           "hide": false,
-          "legendFormat": "5",
+          "legendFormat": "5m",
           "range": true,
           "refId": "B"
         },
@@ -171,7 +389,7 @@
           "editorMode": "code",
           "expr": "system_load15{host=~\"$host\"}",
           "hide": false,
-          "legendFormat": "10",
+          "legendFormat": "10m",
           "range": true,
           "refId": "C"
         }
@@ -181,7 +399,8 @@
     },
     {
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "X3YrI4m7z"
       },
       "description": "",
       "fieldConfig": {
@@ -217,7 +436,7 @@
         "h": 5,
         "w": 4,
         "x": 12,
-        "y": 0
+        "y": 10
       },
       "id": 9,
       "options": {
@@ -236,7 +455,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "X3YrI4m7z"
           },
           "editorMode": "code",
           "expr": "avg(cpu_usage_system{host=~\"$host\", cpu=\"cpu-total\"})",
@@ -251,7 +471,8 @@
     },
     {
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "X3YrI4m7z"
       },
       "description": "",
       "fieldConfig": {
@@ -287,7 +508,7 @@
         "h": 5,
         "w": 4,
         "x": 16,
-        "y": 0
+        "y": 10
       },
       "id": 10,
       "options": {
@@ -321,7 +542,8 @@
     },
     {
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "X3YrI4m7z"
       },
       "description": "",
       "fieldConfig": {
@@ -357,7 +579,7 @@
         "h": 5,
         "w": 4,
         "x": 20,
-        "y": 0
+        "y": 10
       },
       "id": 11,
       "options": {
@@ -376,7 +598,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "X3YrI4m7z"
           },
           "editorMode": "code",
           "expr": "disk_used_percent{host=~\"$host\",path=\"/\"}",
@@ -390,7 +613,8 @@
     },
     {
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "X3YrI4m7z"
       },
       "fieldConfig": {
         "defaults": {
@@ -451,7 +675,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 5
+        "y": 15
       },
       "id": 2,
       "options": {
@@ -473,7 +697,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "X3YrI4m7z"
           },
           "editorMode": "code",
           "expr": "cpu_usage_user{host=~\"$host\", cpu=\"cpu-total\"}",
@@ -487,7 +712,8 @@
     },
     {
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "X3YrI4m7z"
       },
       "fieldConfig": {
         "defaults": {
@@ -549,7 +775,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 5
+        "y": 15
       },
       "id": 3,
       "options": {
@@ -571,7 +797,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "X3YrI4m7z"
           },
           "editorMode": "code",
           "expr": "mem_used_percent{host=~\"$host\"}",
@@ -585,7 +812,8 @@
     },
     {
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "X3YrI4m7z"
       },
       "fieldConfig": {
         "defaults": {
@@ -646,7 +874,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 13
+        "y": 23
       },
       "id": 4,
       "options": {
@@ -668,7 +896,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "X3YrI4m7z"
           },
           "editorMode": "code",
           "expr": "disk_used_percent{host=~\"$host\", path=\"/\"}",
@@ -682,7 +911,8 @@
     },
     {
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "X3YrI4m7z"
       },
       "description": "",
       "fieldConfig": {
@@ -743,7 +973,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 13
+        "y": 23
       },
       "id": 14,
       "options": {
@@ -765,7 +995,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "X3YrI4m7z"
           },
           "editorMode": "code",
           "expr": "rate(avg by (host)(diskio_read_bytes{host=~\"$host\"}))",
@@ -775,7 +1006,8 @@
         },
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "X3YrI4m7z"
           },
           "editorMode": "code",
           "expr": "rate(avg by (host)(diskio_write_bytes{host=~\"$host\"}))",
@@ -790,7 +1022,8 @@
     },
     {
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "X3YrI4m7z"
       },
       "fieldConfig": {
         "defaults": {
@@ -849,7 +1082,7 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 21
+        "y": 31
       },
       "id": 13,
       "options": {
@@ -871,7 +1104,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "X3YrI4m7z"
           },
           "editorMode": "code",
           "expr": "rate ( avg by (host,interface) (net_packets_sent{host=~\"$host\"}))",
@@ -881,7 +1115,8 @@
         },
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "X3YrI4m7z"
           },
           "editorMode": "code",
           "expr": "rate ( avg by (host,interface) (net_packets_recv{host=~\"$host\"}))",
@@ -896,7 +1131,8 @@
     },
     {
       "datasource": {
-        "type": "prometheus"
+        "type": "prometheus",
+        "uid": "X3YrI4m7z"
       },
       "fieldConfig": {
         "defaults": {
@@ -955,7 +1191,7 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 29
+        "y": 39
       },
       "id": 15,
       "options": {
@@ -977,7 +1213,8 @@
       "targets": [
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "X3YrI4m7z"
           },
           "editorMode": "code",
           "expr": "rate ( avg by (host,interface) (net_bytes_sent{host=~\"$host\"}))",
@@ -987,7 +1224,8 @@
         },
         {
           "datasource": {
-            "type": "prometheus"
+            "type": "prometheus",
+            "uid": "X3YrI4m7z"
           },
           "editorMode": "code",
           "expr": "rate ( avg by (host,interface) (net_bytes_recv{host=~\"$host\"}))",
@@ -1015,7 +1253,8 @@
           "value": ""
         },
         "datasource": {
-          "type": "prometheus"
+          "type": "prometheus",
+          "uid": "X3YrI4m7z"
         },
         "definition": "label_values(cpu_usage_system, host)",
         "hide": 0,
@@ -1037,8 +1276,8 @@
     ]
   },
   "time": {
-    "from": "now-5m",
-    "to": "now"
+    "from": "2023-09-11T23:36:27.556Z",
+    "to": "2023-09-12T11:36:27.556Z"
   },
   "timepicker": {},
   "timezone": "",
