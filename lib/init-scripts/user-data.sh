@@ -3,7 +3,10 @@ sleep 15
 # Learn more about user-data: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/user-data.html
 echo "install packages!"
 sudo apt-get update -y && sudo apt-get install ca-certificates curl gnupg -y
-
+while fuser /var/lib/dpkg/lock >& /dev/null; do
+  echo "waiting for other package installs to complete..."
+  sleep 1
+done
 echo "install docker here!"
 sudo install -m 0755 -d /etc/apt/keyrings
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
