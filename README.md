@@ -1,70 +1,140 @@
 # Automating Wax Node deployment on AWS
-## Get start
-- If this is your first time using AWS CDK then [follow these bootstrap instructions](https://docs.aws.amazon.com/cdk/v2/guide/bootstrapping.html).
+## Getting started
+- If this is your first time using AWS CDK then [follow these bootstrap instructions](https://docs.aws.amazon.com/cdk/v2/guide/bootstrapping.html). 
 
-- Install TypeScript globally for CDK
-```
-$ npm i -g typescript
-```
-- If you are running these commands in Cloud or already have CDK installed, then skip this command
-```
-$ npm i -g aws-cdk
-```
+The following commands provide a step-by-step guide for installing and configuring a Wax Node along with other necessary tools and dependencies. The process also includes the installation and setup of AWS CLI and the AWS Systems Manager (SSM) plugin for managing AWS resources, as well as the deployment of the Wax Node infrastructure using the AWS Cloud Development Kit (CDK).
 
-- If you have deleted or don't have the default VPC, create default VPC
-
-```bash
-    aws ec2 create-default-vpc
-   ```
-
-   **Note:** You may see the following error if the default VPC already exists: `An error occurred (DefaultVpcAlreadyExists) when calling the CreateDefaultVpc operation: A Default VPC already exists for this account in this region.`. That means you can just continue with the following steps.
-
-## Build
-- Install
+1. Switch to superuser mode:
 ```
-$ npm install
+   sudo su
 ```
-
-- Build
+## Requirements
+2. Update and upgrade the system packages:
 ```
-$ npm run build
+   apt update -y && apt upgrade -y
 ```
-
-## Deployment Instructions
-### Set the deploy account and region
-Before deploying the project, ensure you have the AWS CLI configured with the desired account and region. Use the following command to bootstrap the CDK environment:
+​
+3. Install essential utilities: curl and unzip:
 ```
-export AWS_REGION=<your_region> 
-export AWS_ACCOUNT_ID=<your_account_id>
-cdk bootstrap aws://$AWS_ACCOUNT_ID/$AWS_REGION
+    apt install -y curl unzip jq
 ```
-
-### Deploy
-This project relies on [wax-node](https://github.com/worldwide-asset-exchange/wax-node) to start the node. To deploy the API node, execute the following command:
-1. Deploy api node
+​
+4. Add Node.js 18.x repository and install Node.js:
 ```
-AWS_REGION=<your_region> AWS_ACCOUNT_ID=<your_account_id> START_FROM_SNAPSHOT=false ENABLE_SHIP_NODE=false npx cdk deploy
-Outputs:
-WaxNodeCdkStack.IPAddress = XXX.XXX.XXX.XXX
-WaxNodeCdkStack.sshcommand = aws ssm start-session --target i-${instance-id} --document-name SSM-WaxNodeCdkConfiguration
+   curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+   apt-get install -y nodejs
 ```
-1. Deploy api node with snapshot
+​
+5. Check the installed versions of Node.js and npm:
 ```
-AWS_REGION=<your_region> AWS_ACCOUNT_ID=<your_account_id> START_FROM_SNAPSHOT=true ENABLE_SHIP_NODE=false npx cdk deploy
+   npm -v
+   node --version
 ```
-1. Deploy ship node
+​
+6. Install AWS CLI:
 ```
-AWS_REGION=<your_region> AWS_ACCOUNT_ID=<your_account_id> START_FROM_SNAPSHOT=false ENABLE_SHIP_NODE=true npx cdk deploy
+    curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+    unzip awscliv2.zip
+    sudo ./aws/install
 ```
-1. Deploy ship node with snapshot
+​
+7. Install AWS Systems Manager (SSM) plugin:
 ```
-AWS_REGION=<your_region> AWS_ACCOUNT_ID=<your_account_id> START_FROM_SNAPSHOT=true ENABLE_SHIP_NODE=true npx cdk deploy
+    curl "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/ubuntu_64bit/session-manager-plugin.deb" -o "session-manager-plugin.deb"
+    sudo dpkg -i session-manager-plugin.deb
+    session-manager-plugin
 ```
-
+​
+8. Install the AWS Cloud Development Kit (CDK) globally:
+```
+   npm install -g aws-cdk
+```
+​
+9. Install a specific version of npm (10.1.0): (if prompted)
+```
+   npm install -g npm@10.1.0
+```
+​
+10. Check the installed version of the CDK:
+```
+   cdk version
+```
+​
+11. Install TypeScript globally:
+```
+   npm i -g typescript
+```
+​
+12. Install AWS CDK globally (again, for redundancy):
+```
+    npm i -g aws-cdk
+```
+​
+13. Configure AWS access keys:
+```
+   aws configure
+```
+14. Clone the Wax AWS CDK repository:
+```
+    git clone https://github.com/worldwide-asset-exchange/wax-aws-cdk.git
+    cd wax-aws-cdk
+```
+### Deploy :
+15. This project relies on wax-node to start the node. To deploy the API node, execute the following command.
+    Choose any one of the desired the set of environment variables from the below to execute.
+    ##Deploy api node with snapshot
+```
+    export AWS_ACCOUNT_ID=98xxxxxxxx
+    export AWS_REGION=eu-central-1
+    export START_FROM_SNAPSHOT=true
+```
+​
+##Deploy ship node
+```
+    export AWS_ACCOUNT_ID=98xxxxxxxx
+    export AWS_REGION=eu-central-1
+    export ENABLE_SHIP_NODE=true
+```
+​
+##Deploy ship node with snapshot
+```
+    export AWS_ACCOUNT_ID=98xxxxxxxx
+    export AWS_REGION=eu-central-1
+    export START_FROM_SNAPSHOT=true
+    export ENABLE_SHIP_NODE=true
+```
+​
+16. Install project dependencies:
+```
+    npm install
+```
+​
+17. Generate CloudFormation templates:
+```
+    cdk synth
+```
+​
+18. Bootstrap the AWS environment:
+```
+    cdk bootstrap aws://$AWS_ACCOUNT_ID/$AWS_REGION
+```
+​
+19. Build the project:
+```
+    npm run build
+```
+​
+20. Deploy the Wax Node infrastructure using CDK:
+```
+    npx cdk deploy
+```
+​
+These commands provide a comprehensive guide for setting up a Wax Node, configuring AWS CLI and SSM, and deploying the necessary infrastructure for the Wax Node using CDK. Be sure to replace the provided access key and secret access key with your own credentials, and adapt any other parameters to your specific use case as needed.
+​
 ### Monitor
 - Monitor log in cloudwatch
-Go to [CloudWatch](https://console.aws.amazon.com/cloudwatch) > Log groups >/waxnode/ > logs
-
+  Go to [CloudWatch](https://console.aws.amazon.com/cloudwatch) > Log groups >/waxnode/ > logs
+  ​
 ## Login to instance
 - Login by Session Manager
 ```
@@ -74,7 +144,7 @@ $ aws ssm start-session --target i-${instance-id} --document-name SSM-WaxNodeCdk
 ```
 $ sudo tail -f /var/log/cloud-init-output.log
 ```
-
+​
 ## Check Node Status
 * Note: it might take up to 30 minutes for the node to start up and few days for the node to sync to the newest block.
 - check log status
@@ -91,7 +161,7 @@ curl http://localhost:8888/v1/chain/get_info
 curl http://{WaxNodeCdkStack.IPAddress}:8888/v1/chain/get_info
 ```
 - More info about Wax Node [here](https://github.com/worldwide-asset-exchange/wax-node/)
-
+  ​
 ## Useful commands
 * `npm run build`   compile typescript to js
 * `npm run watch`   watch for changes and compile
