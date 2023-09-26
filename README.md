@@ -149,8 +149,8 @@ aws ec2 authorize-security-group-ingress --group-id `aws ec2 describe-instances 
 echo http://$GRAFANA_IP:3000 
 ```
 ## Default credentials of grafana
-user : admin
-password : admin
+- user : admin
+- password : admin
 
 ## Login to instance
 - Login by Session Manager
