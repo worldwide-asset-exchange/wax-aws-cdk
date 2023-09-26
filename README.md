@@ -81,7 +81,7 @@ The following commands provide a step-by-step guide for installing and configuri
 ```
 ### Deploy :
 15. This project relies on wax-node to start the node. To deploy the API node, execute the following command.
-    Choose any one of the desired the set of environment variables from the below to execute.
+    Choose any one of the desired set of environment variables from the below to execute.
 ## Deploy api node with snapshot
 ```
     export AWS_ACCOUNT_ID=`aws sts get-caller-identity | jq -r .Account`
