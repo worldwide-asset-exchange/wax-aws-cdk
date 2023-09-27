@@ -1,5 +1,7 @@
 The following commands provide a step-by-step guide for installing and configuring a Wax Node along with other necessary tools and dependencies. The process also includes the installation and setup of AWS CLI and the AWS Systems Manager (SSM) plugin for managing AWS resources, as well as the deployment of the Wax Node infrastructure using the AWS Cloud Development Kit (CDK).
 
+<details><summary>Operating System : Linux : ubuntu 20.04 </summary>
+
 1. Switch to superuser mode:
 ```
    sudo su
@@ -131,6 +133,12 @@ The following commands provide a step-by-step guide for installing and configuri
 
 These commands provide a comprehensive guide for setting up a Wax Node, configuring AWS CLI and SSM, and deploying the necessary infrastructure for the Wax Node using CDK. Be sure to replace the provided access key and secret access key with your own credentials, and adapt any other parameters to your specific use case as needed.
 
+</details>
+
+
+<details><summary>Monitoring</summary>
+
+
 ### Monitor
 - Monitor log in cloudwatch
   Go to [CloudWatch](https://console.aws.amazon.com/cloudwatch) > Log groups >/waxnode/ > logs
@@ -174,10 +182,12 @@ curl http://localhost:8888/v1/chain/get_info | jq
 ```
 - Monitor the node status
 ```
-# Check note status
+# Check node status
 curl http://`wget -q -O - http://169.254.169.254/latest/meta-data/public-ipv4`:8888/v1/chain/get_info | jq
 ```
 - More info about Wax Node [here](https://github.com/worldwide-asset-exchange/wax-node/)
+
+</details>
 
 ## Useful commands
 * `npm run build`   compile typescript to js
