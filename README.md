@@ -81,24 +81,24 @@ The following commands provide a step-by-step guide for installing and configuri
     git clone https://github.com/worldwide-asset-exchange/wax-aws-cdk.git
     cd wax-aws-cdk
 ```
-### Deploy :
+# Deploy :
 15. This project relies on wax-node to start the node. To deploy the API node, execute the following command.
     Choose any one of the desired set of environment variables from the below to execute.
-## Deploy api node with snapshot
+### Deploy api node with snapshot
 ```
     export AWS_ACCOUNT_ID=`aws sts get-caller-identity | jq -r .Account`
     export AWS_REGION=eu-central-1
     export START_FROM_SNAPSHOT=true
 ```
 
-## Deploy ship node
+### Deploy ship node
 ```
     export AWS_ACCOUNT_ID=`aws sts get-caller-identity | jq -r .Account`
     export AWS_REGION=eu-central-1
     export ENABLE_SHIP_NODE=true
 ```
 
-## Deploy ship node with snapshot
+### Deploy ship node with snapshot
 ```
     export AWS_ACCOUNT_ID=`aws sts get-caller-identity | jq -r .Account`
     export AWS_REGION=eu-central-1
@@ -138,47 +138,47 @@ These commands provide a comprehensive guide for setting up a Wax Node, configur
 
 # Monitoring
 
-- Monitor log in cloudwatch
+### Monitor log in cloudwatch
   Go to [CloudWatch](https://console.aws.amazon.com/cloudwatch) > Log groups >/waxnode/ > logs
 ```
 echo Link: https://$AWS_REGION.console.aws.amazon.com/cloudwatch/home?region=$AWS_REGION#logsV2:log-groups/log-group/\$252Fwaxnode\$252F/log-events/logs
 ```
-- For Grafana dashboards
+### For Grafana dashboards
 
 ```
 export INSTANCE_ID=`aws ec2 describe-instances --filters "Name=tag:aws:cloudformation:stack-name,Values=WaxNodeCdkStack" | jq -r '.[]|.[] |.Instances[].InstanceId'`
 export GRAFANA_IP=`aws ec2 describe-instances --instance-ids $INSTANCE_ID | jq -r ".[]|.[]|.Instances[]|.NetworkInterfaces[].Association.PublicIp"`
 ```
-## To open the grafana ip publicly use the below command
+### Open the grafana ip to public use the below command
 ```
 aws ec2 authorize-security-group-ingress --group-id `aws ec2 describe-instances --instance-ids $INSTANCE_ID | jq -r ".[]|.[]|.Instances[]|.SecurityGroups[].GroupId"` --ip-permissions IpProtocol=tcp,FromPort=3001,ToPort=3001,IpRanges='[{CidrIp='0.0.0.0/0',Description="wideopen"}]'
 echo http://$GRAFANA_IP:3000 
 ```
-## Default credentials of grafana
+### Default credentials of grafana
 - user : admin
 - password : admin
 
-## Login to instance
-- Login by Session Manager
+### Login to instance
+### Login by Session Manager
 ```
   aws ssm start-session --target i-$INSTANCE_ID --document-name SSM-WaxNodeCdkConfiguration
 ```
-- Check Setup status
+### Check Setup status
 ```
   sudo tail -f /var/log/cloud-init-output.log
 ```
 
-## Check Node Status
+### Check Node Status
 * Note: it might take up to 30 minutes for the node to start up and few days for the node to sync to the newest block.
 - check log status
 ```
   tail -f /var/log/wax/logs.log
 ```
-- Monitor the node status inside instance
+### Monitor the node status inside instance
 ```
 curl http://localhost:8888/v1/chain/get_info | jq 
 ```
-- Monitor the node status
+### Monitor the node status
 ```
 # Check node status
 curl http://`wget -q -O - http://169.254.169.254/latest/meta-data/public-ipv4`:8888/v1/chain/get_info | jq
