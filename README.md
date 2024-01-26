@@ -3,18 +3,19 @@ The following commands provide a step-by-step guide for installing and configuri
 <details>
 <summary> Wax Node CDK Environment Setup </summary>
 
-
 ## System Prerequisites:
 <br />Operating System : Ubuntu 20.04 LTS <br />
 Minimum CPU : 4 cores <br />
 Minimum RAM : 16GiB <br />
 Minimum Storage: 20GiB <br />
 
+
 1. Switch to superuser mode:
 ```
    sudo su
 ```
-## Requirements
+
+### Requirements
 2. Update and upgrade the system packages:
 ```
    apt update -y && apt upgrade -y
@@ -78,7 +79,6 @@ Minimum Storage: 20GiB <br />
 
 13. Configure AWS access keys:
 - Provide aws access keys For better results please have access key with following permissions policies  "AdministratorAccess"
-
 - Note : provide region while configuring to avoid any conflicts
 ```
    aws configure
@@ -89,24 +89,25 @@ Minimum Storage: 20GiB <br />
     git clone https://github.com/worldwide-asset-exchange/wax-aws-cdk.git
     cd wax-aws-cdk
 ```
-### Deploy :
+
+# Deploy :
 15. This project relies on wax-node to start the node. To deploy the API node, execute the following command.
     Choose any one of the desired set of environment variables from the below to execute.
-## Deploy api node with snapshot
+### Deploy api node with snapshot
 ```
     export AWS_ACCOUNT_ID=`aws sts get-caller-identity | jq -r .Account`
     export AWS_REGION=eu-central-1
     export START_FROM_SNAPSHOT=true
 ```
 
-## Deploy ship node
+### Deploy ship node
 ```
     export AWS_ACCOUNT_ID=`aws sts get-caller-identity | jq -r .Account`
     export AWS_REGION=eu-central-1
     export ENABLE_SHIP_NODE=true
 ```
 
-## Deploy ship node with snapshot
+### Deploy ship node with snapshot
 ```
     export AWS_ACCOUNT_ID=`aws sts get-caller-identity | jq -r .Account`
     export AWS_REGION=eu-central-1
@@ -141,19 +142,20 @@ Minimum Storage: 20GiB <br />
 
 These commands provide a comprehensive guide for setting up a Wax Node, configuring AWS CLI and SSM, and deploying the necessary infrastructure for the Wax Node using CDK. Be sure to replace the provided access key and secret access key with your own credentials, and adapt any other parameters to your specific use case as needed.
 
-</details>
-
+</details> 
 <br />
-<details><summary>Monitoring</summary>
+<details>
 
+<summary>Monitoring</summary>
 
-### Monitor
-- Monitor log in cloudwatch
+# Monitoring
+
+### Monitor log in cloudwatch
   Go to [CloudWatch](https://console.aws.amazon.com/cloudwatch) > Log groups >/waxnode/ > logs
 ```
 echo Link: https://$AWS_REGION.console.aws.amazon.com/cloudwatch/home?region=$AWS_REGION#logsV2:log-groups/log-group/\$252Fwaxnode\$252F/log-events/logs
 ```
-- For Grafana dashboards
+### For Grafana dashboards
 
 ```
 export INSTANCE_ID=`aws ec2 describe-instances --filters "Name=tag:aws:cloudformation:stack-name,Values=WaxNodeCdkStack" | jq -r '.[]|.[] |.Instances[].InstanceId'`
@@ -168,48 +170,48 @@ Port 8080 - Websocket for SHIP node
 Port 80 - HTTP Port for access the apis on 8888 and also grafana monitoring
 ```
 
-
 ## To open the grafana ip publicly use the below command
 ```
 aws ec2 authorize-security-group-ingress --group-id `aws ec2 describe-instances --instance-ids $INSTANCE_ID | jq -r ".[]|.[]|.Instances[]|.SecurityGroups[].GroupId"` --ip-permissions IpProtocol=tcp,FromPort=80,ToPort=80,IpRanges='[{CidrIp='0.0.0.0/0',Description="wideopen"}]'
 echo http://$GRAFANA_IP/monitoring/ 
 ```
 
-## Grafana Admin Password
+### Default credentials of grafana
 - Can be found in the following file.
 ```
 cat /root/.grafanapassword
 ```
 
-
-## Login to instance
-- Login by Session Manager
+### Login to instance
+### Login by Session Manager
 ```
   aws ssm start-session --target i-$INSTANCE_ID --document-name SSM-WaxNodeCdkConfiguration
 ```
-- Check Setup status
+### Check Setup status
 ```
   sudo tail -f /var/log/cloud-init-output.log
 ```
 
-## Check Node Status
+### Check Node Status
 * Note: it might take up to 30 minutes for the node to start up and few days for the node to sync to the newest block.
 - check log status
 ```
   tail -f /var/log/wax/logs.log
 ```
-- Monitor the node status inside instance
+
+### Monitor the node status inside instance
 ```
 curl http://localhost:8888/v1/chain/get_info | jq 
 ```
-- Monitor the node status
+
+### Monitor the node status
 ```
 # Check node status
 curl http://`wget -q -O - http://169.254.169.254/latest/meta-data/public-ipv4`:8888/v1/chain/get_info | jq
 ```
 - More info about Wax Node [here](https://github.com/worldwide-asset-exchange/wax-node/)
 
-</details>
+
 
 ## Useful commands
 * `npm run build`   compile typescript to js
@@ -218,3 +220,5 @@ curl http://`wget -q -O - http://169.254.169.254/latest/meta-data/public-ipv4`:8
 * `cdk deploy`      deploy this stack to your default AWS account/region
 * `cdk diff`        compare deployed stack with current state
 * `cdk synth`       emits the synthesized CloudFormation template
+
+</details>
