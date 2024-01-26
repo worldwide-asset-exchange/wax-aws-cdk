@@ -1,6 +1,14 @@
 The following commands provide a step-by-step guide for installing and configuring a Wax Node along with other necessary tools and dependencies. The process also includes the installation and setup of AWS CLI and the AWS Systems Manager (SSM) plugin for managing AWS resources, as well as the deployment of the Wax Node infrastructure using the AWS Cloud Development Kit (CDK).
 
-<details><summary>Operating System : Linux : ubuntu 20.04 </summary>
+<details>
+<summary> Wax Node CDK Environment Setup </summary>
+
+
+## System Prerequisites:
+<br />Operating System : Ubuntu 20.04 LTS <br />
+Minimum CPU : 4 cores <br />
+Minimum RAM : 16GiB <br />
+Minimum Storage: 20GiB <br />
 
 1. Switch to superuser mode:
 ```
@@ -135,7 +143,7 @@ These commands provide a comprehensive guide for setting up a Wax Node, configur
 
 </details>
 
-
+<br />
 <details><summary>Monitoring</summary>
 
 
@@ -151,14 +159,28 @@ echo Link: https://$AWS_REGION.console.aws.amazon.com/cloudwatch/home?region=$AW
 export INSTANCE_ID=`aws ec2 describe-instances --filters "Name=tag:aws:cloudformation:stack-name,Values=WaxNodeCdkStack" | jq -r '.[]|.[] |.Instances[].InstanceId'`
 export GRAFANA_IP=`aws ec2 describe-instances --instance-ids $INSTANCE_ID | jq -r ".[]|.[]|.Instances[]|.NetworkInterfaces[].Association.PublicIp"`
 ```
-# To open the grafana ip publicly use the below command
+
+# List of ports opened for wax nodes ( which are accessible via the VPC CIDR block by default and are not publically open)
 ```
-aws ec2 authorize-security-group-ingress --group-id `aws ec2 describe-instances --instance-ids $INSTANCE_ID | jq -r ".[]|.[]|.Instances[]|.SecurityGroups[].GroupId"` --ip-permissions IpProtocol=tcp,FromPort=3001,ToPort=3001,IpRanges='[{CidrIp='0.0.0.0/0',Description="wideopen"}]'
-echo http://$GRAFANA_IP:3000 
+Port 8888 - API port for API / Ship node
+Port 9876 - P2P port for API node
+Port 8080 - Websocket for SHIP node
+Port 80 - HTTP Port for access the apis on 8888 and also grafana monitoring
 ```
-## Default credentials of grafana
-- user : admin
-- password : admin
+
+
+## To open the grafana ip publicly use the below command
+```
+aws ec2 authorize-security-group-ingress --group-id `aws ec2 describe-instances --instance-ids $INSTANCE_ID | jq -r ".[]|.[]|.Instances[]|.SecurityGroups[].GroupId"` --ip-permissions IpProtocol=tcp,FromPort=80,ToPort=80,IpRanges='[{CidrIp='0.0.0.0/0',Description="wideopen"}]'
+echo http://$GRAFANA_IP/monitoring/ 
+```
+
+## Grafana Admin Password
+- Can be found in the following file.
+```
+cat /root/.grafanapassword
+```
+
 
 ## Login to instance
 - Login by Session Manager

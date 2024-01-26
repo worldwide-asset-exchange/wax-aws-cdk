@@ -58,12 +58,6 @@ export class WaxNodeCdkStack extends cdk.Stack {
 
     securityGroup.addIngressRule(
       ec2.Peer.ipv4(vpc.vpcCidrBlock),
-      ec2.Port.tcp(443),
-      'Allow HTTPS traffic only from within the VPC',
-    );
-
-    securityGroup.addIngressRule(
-      ec2.Peer.ipv4(vpc.vpcCidrBlock),
       ec2.Port.tcp(8888),
       'Allow api nodeos port: 8888 from within the VPC',
     );
@@ -170,6 +164,10 @@ export class WaxNodeCdkStack extends cdk.Stack {
     // Create outputs for connecting
     new cdk.CfnOutput(this, 'IP Address', { value: ec2Instance.instancePublicIp });
     new cdk.CfnOutput(this, 'ssh command', { value: 'aws ssm start-session --target ' + ec2Instance.instanceId + ' --document-name ' + cfnDocument.name });
+    new cdk.CfnOutput(this, 'gpassword', {
+      value: '',
+      description: 'Grafana Admin Password'
+    })
 
     // Add a nag suppressions.
     NagSuppressions.addResourceSuppressions(
